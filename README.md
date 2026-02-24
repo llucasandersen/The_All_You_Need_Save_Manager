@@ -79,3 +79,9 @@ Extract so this path exists:
 
 - GitHub: https://github.com/llucasandersen/The_All_You_Need_Save_Manager
 - Thunderstore: https://thunderstore.io/c/peak/p/llucasandersen/The_All_You_Need_Save_Manager/
+
+## Contributing
+
+- Open an issue: https://github.com/llucasandersen/The_All_You_Need_Save_Manager/issues
+- Read the guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Open a pull request: https://github.com/llucasandersen/The_All_You_Need_Save_Manager/pulls

@@ -1,0 +1,37 @@
+name: Help or question
+description: Ask for setup help or usage clarification
+title: "[Help]: "
+labels:
+  - question
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: Describe what you are trying to do.
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you already tried
+      description: Include steps you already took.
+    validations:
+      required: false
+
+  - type: input
+    id: plugin_version
+    attributes:
+      label: Plugin version
+      placeholder: "Example: 1.0.3"
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or screenshots
+      render: text
+    validations:
+      required: false

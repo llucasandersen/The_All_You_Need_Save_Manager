@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest an improvement or new feature
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share what you want to improve and why.
+        Clear use-cases make requests easier to prioritize.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What is hard or missing right now?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior you want.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workaround or other idea you tried.
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: What would make this complete
+      description: Add concrete acceptance criteria if you can.
+      placeholder: |
+        - [ ] Saves include X
+        - [ ] UI shows Y
+        - [ ] Works in multiplayer host mode
+    validations:
+      required: false

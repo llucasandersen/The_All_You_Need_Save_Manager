@@ -1,0 +1,90 @@
+name: Bug report
+description: Report a reproducible problem
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this.
+        Fill in as much detail as you can so we can reproduce it quickly.
+
+  - type: input
+    id: plugin_version
+    attributes:
+      label: Plugin version
+      placeholder: "Example: 1.0.3"
+    validations:
+      required: true
+
+  - type: input
+    id: game_version
+    attributes:
+      label: PEAK game version
+      placeholder: "Example: current Steam version"
+    validations:
+      required: true
+
+  - type: input
+    id: bepinex_version
+    attributes:
+      label: BepInEx version
+      placeholder: "Example: 5.4.2403"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Game mode
+      options:
+        - Singleplayer
+        - Multiplayer host
+        - Multiplayer client
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Write exact steps from a clean start if possible.
+      placeholder: |
+        1. Start run at Airport
+        2. Save with name X
+        3. Load save X
+        4. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: BepInEx log output
+      description: Paste relevant log lines. Remove personal info first.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra context
+      description: Screenshots, save file notes, or anything else useful.
+    validations:
+      required: false
