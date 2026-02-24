@@ -1,0 +1,9 @@
+{
+  "name": "The_All_You_Need_Save_Manager",
+  "version_number": "1.0.3",
+  "website_url": "https://github.com/llucasandersen/The_All_You_Need_Save_Manager",
+  "description": "All-in-one PEAK save manager with run, player, inventory, and world restore.",
+  "dependencies": [
+    "BepInEx-BepInExPack_PEAK-5.4.2403"
+  ]
+}
