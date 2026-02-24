@@ -1,6 +1,6 @@
 # The All You Need Save Manager (TAYNSM)
 
-![TAYNSM icon](icon.png)
+![TAYNSM icon](https://github.com/llucasandersen/The_All_You_Need_Save_Manager/raw/main/icon.png)
 
 All-in-one save manager for PEAK. Save your run, load it later, and continue with the same run setup, player state, inventory, and most world objects.
 
