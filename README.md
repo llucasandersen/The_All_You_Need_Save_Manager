@@ -52,6 +52,20 @@ All-in-one save manager for PEAK. Save your run, load it later, and continue wit
 3. In the save list, click `Load` on the save you want.
 4. Use `Overwrite` to replace an existing save with your current run state.
 
+## Autosave
+
+Autosave can be disabled in the BepInEx config file.
+
+- Config file: `BepInEx/config/com.lucasandersen.peakallyouneedsavemanager.cfg`
+- Section: `AutoSave`
+- Setting: `Enable AutoSave = false`
+
+You can also change the autosave timer with:
+
+- `Interval Seconds = 300`
+
+If the config file does not exist yet, launch the game once with the mod installed and BepInEx will generate it.
+
 ## Where Loading Works
 
 - You can load from Airport.
