@@ -77,6 +77,7 @@ If the config file does not exist yet, launch the game once with the mod install
 - Folder: `<PEAK root>/PeakSaves`
 - Extension: `.peaksave.json`
 - Versioned format with compatibility checks for safe loading
+- If the game install folder is not writable, TAYNSM falls back to a writable save folder automatically
 
 ## Known Bugs
 
