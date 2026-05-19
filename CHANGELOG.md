@@ -1,3 +1,10 @@
+## 1.0.5
+
+- Fixed a load pipeline failure that could stop restore early during scout or other world object restore work.
+- Prevented scout cannon restore mismatches from aborting the rest of the load.
+- Improved load failure logging and UI error reporting.
+- Added scout coverage to save verification tests.
+
 ## 1.0.4
 
 - Fixed save creation failing on some installs when the game root save folder was not writable.
