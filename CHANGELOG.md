@@ -1,3 +1,9 @@
+## 1.0.6
+
+- Fixed duplicate item data key restore failures during load, including the reported `CookedAmount` crash.
+- Prevented ground item restore errors from blocking the player position restore that happens later in the load flow.
+- Improved reliability when loading host saves back from Airport into multiplayer runs.
+
 ## 1.0.5
 
 - Fixed a load pipeline failure that could stop restore early during scout or other world object restore work.
