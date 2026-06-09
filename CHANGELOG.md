@@ -1,3 +1,9 @@
+## 1.0.7
+
+- Fixed multiplayer load continuing with only the host matched instead of waiting for the full saved party.
+- Improved multiplayer player matching during load from Airport into a saved run.
+- Added clearer load failure messaging when saved players are missing or not ready yet.
+
 ## 1.0.6
 
 - Fixed duplicate item data key restore failures during load, including the reported `CookedAmount` crash.
