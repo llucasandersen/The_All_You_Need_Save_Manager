@@ -10,3 +10,4 @@ obj/
 
 Thumbs.db
 .DS_Store
+build/

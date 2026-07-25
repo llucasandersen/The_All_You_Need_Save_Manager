@@ -1,3 +1,9 @@
+## 1.0.8
+
+- Fixed multiplayer save loads stopping early when the full saved party was not matched before restore.
+- Multiplayer loads now wait briefly for joiners, then continue with every matching player instead of cancelling the whole load.
+- Added the source project and verification tool to the GitHub repo so contributors can build and submit fixes more easily.
+
 ## 1.0.7
 
 - Fixed multiplayer load continuing with only the host matched instead of waiting for the full saved party.
