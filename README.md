@@ -69,6 +69,7 @@ If the config file does not exist yet, launch the game once with the mod install
 - You can load while already in a run.
 - In multiplayer, the host controls save and load.
 - Multiplayer loads now restore every saved player that matches, even if the full saved party is not present yet.
+- Backpack restoration uses the existing save format. If a save was created after a backpack was lost and records no backpack or contents, load an earlier save that still contains them.
 
 ## Save Files
 

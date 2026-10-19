@@ -69,8 +69,6 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
 
     private static readonly FieldInfo RunManagerTimerActiveField = AccessTools.Field(typeof(RunManager), "timerActive");
 
-    private static readonly FieldInfo BackpackSlotTypeField = AccessTools.Field(typeof(BackpackSlot), "backpackType");
-
     private static readonly PropertyInfo RopeShooterAmmoProperty = AccessTools.Property(typeof(RopeShooter), "Ammo");
 
     private static readonly MethodInfo RopeShooterSyncRpcMethod = AccessTools.Method(typeof(RopeShooter), "Sync_Rpc", new[] { typeof(bool) });
@@ -3163,7 +3161,14 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
                 continue;
             }
 
-            yield return StartCoroutine(ApplyPlayerSnapshotRoutine(target, playerSnapshot));
+            // Advance here so restore failures reach LoadSaveRoutine's error handler.
+            // Unity otherwise logs a nested coroutine exception and continues this load
+            // as if that player's inventory had been restored successfully.
+            IEnumerator restorePlayer = ApplyPlayerSnapshotRoutine(target, playerSnapshot);
+            while (restorePlayer.MoveNext())
+            {
+                yield return restorePlayer.Current;
+            }
             appliedCount++;
         }
 
@@ -3754,6 +3759,28 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
             return;
         }
 
+        // Resolve before clearing anything so an unsupported/missing backpack cannot
+        // silently replace the player's current inventory with an incomplete restore.
+        Item backpackPrefab = null;
+        BackpackSlot.BackpackType backpackType = BackpackSlot.BackpackType.None;
+        if (snapshot.hasBackpack)
+        {
+            string savedType = string.IsNullOrWhiteSpace(snapshot.backpackType) ? "Backpack" : snapshot.backpackType;
+            if (player.backpackSlot == null
+                || !Enum.TryParse(savedType, true, out backpackType)
+                || backpackType == BackpackSlot.BackpackType.None
+                || !Enum.IsDefined(typeof(BackpackSlot.BackpackType), backpackType))
+            {
+                throw new InvalidOperationException($"Cannot restore backpack: unsupported type '{savedType}'. Inventory was not cleared.");
+            }
+
+            string backpackPrefabName = backpackType.ToString();
+            if (!ItemDatabase.TryGetItem(backpackPrefabName, out backpackPrefab) || backpackPrefab == null)
+            {
+                throw new InvalidOperationException($"Cannot restore backpack: item prefab '{backpackPrefabName}' is unavailable. Inventory was not cleared.");
+            }
+        }
+
         if (player.itemSlots != null)
         {
             for (int i = 0; i < player.itemSlots.Length; i++)
@@ -3775,12 +3802,12 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
 
         if (snapshot.hasBackpack && player.backpackSlot != null)
         {
-            SetBackpackType(player, snapshot.backpackType);
+            player.backpackSlot.backpackType = backpackType;
+            // InventorySyncData serializes the slot's prefab ID as well as its type/data.
+            // Without a prefab, SyncInventoryRPC receives 65535 and SetItem(null, ...)
+            // calls BackpackSlot.EmptyOut(), removing the restored backpack on every peer.
             ItemInstanceData backpackInstanceData = CreateItemInstanceData();
-            if (!SetBackpackSlotInstanceData(player, backpackInstanceData))
-            {
-                backpackInstanceData = GetBackpackSlotInstanceData(player);
-            }
+            player.backpackSlot.SetItem(backpackPrefab, backpackInstanceData);
 
             if (TryEnsureBackpackData(backpackInstanceData, out BackpackData backpackData))
             {
@@ -5451,25 +5478,6 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
         }
 
         return null;
-    }
-
-    private static void SetBackpackType(GamePlayer player, string savedType)
-    {
-        if (player?.backpackSlot == null || BackpackSlotTypeField == null)
-        {
-            return;
-        }
-
-        string typeName = string.IsNullOrWhiteSpace(savedType) ? "Backpack" : savedType;
-        try
-        {
-            object backpackType = Enum.Parse(BackpackSlotTypeField.FieldType, typeName, true);
-            BackpackSlotTypeField.SetValue(player.backpackSlot, backpackType);
-        }
-        catch (Exception ex)
-        {
-            Instance?.Logger.LogWarning($"Could not restore backpack type '{typeName}': {ex.Message}");
-        }
     }
 
     private static bool SetBackpackSlotInstanceData(GamePlayer player, ItemInstanceData instanceData)

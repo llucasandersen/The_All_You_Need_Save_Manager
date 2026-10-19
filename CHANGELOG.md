@@ -1,3 +1,8 @@
+## Unreleased
+
+- Fixed worn backpacks disappearing during inventory synchronization after loading a save.
+- Report player restore failures instead of continuing to a successful load message.
+
 ## 1.0.9
 
 - Fixed saving on current PEAK builds after the run timer field became private.
