@@ -29,6 +29,17 @@ dotnet build src/PeakSaveManager/PeakSaveManager.csproj -c Release -p:BepInExCor
 dotnet run --project tools/SaveVerificationTests/SaveVerificationTests.csproj -c Release
 ```
 
+After building, verify item usage restoration against the same game assemblies in
+a fresh PowerShell 7 process:
+
+```powershell
+pwsh -NoProfile -File tools/Verify-ItemUsageData.ps1 -GameManagedPath "<PEAK>/PEAK_Data/Managed" -BepInExCorePath "<BepInEx>/core"
+```
+
+This calls both managed restore paths and the game's typed data lookup. It covers
+legacy saves, incorrectly typed entries, generic-entry precedence, exhausted and
+unlimited items, and absent values. It does not replace in-game or multiplayer testing.
+
 ## What to include in issues
 
 - Plugin version

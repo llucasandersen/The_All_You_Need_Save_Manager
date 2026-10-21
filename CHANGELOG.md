@@ -1,3 +1,7 @@
+## Unreleased
+
+- Restore ItemUses with the optional integer type expected by PEAK, preserving generic entries and unlimited-use state for inventory and ground items.
+
 ## 1.0.9
 
 - Fixed saving on current PEAK builds after the run timer field became private.

@@ -2415,13 +2415,14 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
         }
     }
 
-    private static void ApplyGenericItemData(ItemInstanceData data, List<ItemDataEntrySnapshot> snapshots)
+    private static bool ApplyGenericItemData(ItemInstanceData data, List<ItemDataEntrySnapshot> snapshots)
     {
         if (data == null || snapshots == null || snapshots.Count == 0)
         {
-            return;
+            return false;
         }
 
+        bool restoredItemUses = false;
         for (int i = 0; i < snapshots.Count; i++)
         {
             ItemDataEntrySnapshot entry = snapshots[i];
@@ -2441,16 +2442,28 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
                 continue;
             }
 
+            if (key == DataEntryKey.ItemUses)
+            {
+                value = ItemUsesRestoration.Normalize(value);
+                if (value == null)
+                {
+                    continue;
+                }
+            }
+
             try
             {
                 data.data ??= new Dictionary<DataEntryKey, DataEntryValue>();
                 data.data[key] = value;
+                restoredItemUses |= key == DataEntryKey.ItemUses;
             }
             catch
             {
                 // Ignore incompatible entry restoration on game updates.
             }
         }
+
+        return restoredItemUses;
     }
 
     private static bool TryResolveDataEntryKey(ItemDataEntrySnapshot entry, out DataEntryKey key)
@@ -3851,13 +3864,8 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
             return;
         }
 
-        ApplyGenericItemData(data, snapshot.dataEntries);
-
-        int? itemUses = snapshot.itemUses;
-        if (itemUses.HasValue)
-        {
-            SetItemDataEntry(data, DataEntryKey.ItemUses, new IntItemData { Value = Mathf.Max(0, itemUses.Value) });
-        }
+        bool restoredItemUses = ApplyGenericItemData(data, snapshot.dataEntries);
+        ItemUsesRestoration.ApplyLegacy(data, snapshot.itemUses, restoredItemUses);
 
         if (snapshot.petterItemUses.HasValue)
         {
@@ -4649,55 +4657,7 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
         }
 
         ItemInstanceData data = EnsureItemInstanceData(item);
-        if (data != null)
-        {
-            ApplyGenericItemData(data, snapshot.dataEntries);
-
-            if (snapshot.itemUses.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.ItemUses, new IntItemData { Value = Mathf.Max(0, snapshot.itemUses.Value) });
-            }
-
-            if (snapshot.petterItemUses.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.PetterItemUses, new IntItemData { Value = Mathf.Max(0, snapshot.petterItemUses.Value) });
-            }
-
-            if (snapshot.useRemainingPercentage.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.UseRemainingPercentage, new FloatItemData { Value = Mathf.Clamp01(snapshot.useRemainingPercentage.Value) });
-            }
-
-            if (snapshot.used.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.Used, new BoolItemData { Value = snapshot.used.Value });
-            }
-
-            if (snapshot.fuel.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.Fuel, new FloatItemData { Value = Mathf.Max(0f, snapshot.fuel.Value) });
-            }
-
-            if (snapshot.cookedAmount.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.CookedAmount, new IntItemData { Value = Mathf.Max(0, snapshot.cookedAmount.Value) });
-            }
-
-            if (snapshot.flareActive.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.FlareActive, new BoolItemData { Value = snapshot.flareActive.Value });
-            }
-
-            if (snapshot.screamTime.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.ScreamTime, new FloatItemData { Value = Mathf.Max(0f, snapshot.screamTime.Value) });
-            }
-
-            if (snapshot.spawnedBees.HasValue)
-            {
-                SetItemDataEntry(data, DataEntryKey.SpawnedBees, new BoolItemData { Value = snapshot.spawnedBees.Value });
-            }
-        }
+        ApplyItemUsageData(data, snapshot);
 
         if (snapshot.useRemainingPercentage.HasValue)
         {
@@ -4721,6 +4681,57 @@ public sealed class SaveManagerPlugin : BaseUnityPlugin
             {
                 // Ignore field restore failures on game updates.
             }
+        }
+    }
+
+    private static void ApplyItemUsageData(ItemInstanceData data, GroundItemSnapshot snapshot)
+    {
+        if (data == null || snapshot == null)
+        {
+            return;
+        }
+
+        bool restoredItemUses = ApplyGenericItemData(data, snapshot.dataEntries);
+        ItemUsesRestoration.ApplyLegacy(data, snapshot.itemUses, restoredItemUses);
+
+        if (snapshot.petterItemUses.HasValue)
+        {
+            SetItemDataEntry(data, DataEntryKey.PetterItemUses, new IntItemData { Value = Mathf.Max(0, snapshot.petterItemUses.Value) });
+        }
+
+        if (snapshot.useRemainingPercentage.HasValue)
+        {
+            SetItemDataEntry(data, DataEntryKey.UseRemainingPercentage, new FloatItemData { Value = Mathf.Clamp01(snapshot.useRemainingPercentage.Value) });
+        }
+
+        if (snapshot.used.HasValue)
+        {
+            SetItemDataEntry(data, DataEntryKey.Used, new BoolItemData { Value = snapshot.used.Value });
+        }
+
+        if (snapshot.fuel.HasValue)
+        {
+            SetItemDataEntry(data, DataEntryKey.Fuel, new FloatItemData { Value = Mathf.Max(0f, snapshot.fuel.Value) });
+        }
+
+        if (snapshot.cookedAmount.HasValue)
+        {
+            SetItemDataEntry(data, DataEntryKey.CookedAmount, new IntItemData { Value = Mathf.Max(0, snapshot.cookedAmount.Value) });
+        }
+
+        if (snapshot.flareActive.HasValue)
+        {
+            SetItemDataEntry(data, DataEntryKey.FlareActive, new BoolItemData { Value = snapshot.flareActive.Value });
+        }
+
+        if (snapshot.screamTime.HasValue)
+        {
+            SetItemDataEntry(data, DataEntryKey.ScreamTime, new FloatItemData { Value = Mathf.Max(0f, snapshot.screamTime.Value) });
+        }
+
+        if (snapshot.spawnedBees.HasValue)
+        {
+            SetItemDataEntry(data, DataEntryKey.SpawnedBees, new BoolItemData { Value = snapshot.spawnedBees.Value });
         }
     }
 
